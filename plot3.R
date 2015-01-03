@@ -1,0 +1,16 @@
+require(data.table)
+DT<-fread("household_power_consumption.txt",colClasses='character')
+setkey(DT,Date)
+DT<-DT[c("1/2/2007","2/2/2007")]
+require(lubridate)
+DT[,DateTime:=dmy_hms(paste(Date, Time))]
+for (col in c("Sub_metering_1","Sub_metering_2","Sub_metering_3")) set(DT, j=col, value=as.numeric(DT[[col]]))
+png(file = "plot3.png",bg = "transparent")
+yrange<-range(c(DT$Sub_metering_1,DT$Sub_metering_2,DT$Sub_metering_3))
+xrange<-range(DT$DateTime)
+plot(xrange,yrange,type="n", xlab="",ylab="Energy sub metering" )
+lines(DT$DateTime, DT$Sub_metering_1, type="l", col="black") 
+lines(DT$DateTime, DT$Sub_metering_2, type="l", col="red") 
+lines(DT$DateTime, DT$Sub_metering_3, type="l", col="blue") 
+legend("topright", c("Sub_metering_1","Sub_metering_2","Sub_metering_3"), col=c("black","red","blue"),lty=c(1,1,1))
+dev.off()
